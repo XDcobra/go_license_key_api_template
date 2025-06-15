@@ -1,1 +1,1 @@
-# go_license_key_api
+# go_license_key_api_template
