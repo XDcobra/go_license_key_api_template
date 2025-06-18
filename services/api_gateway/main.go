@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	rediscontroller "github.com/XDcobra/go_license_key_api_template/controller"
+	dummycontroller "github.com/XDcobra/go_license_key_api_template/controller/DummyController"
+	rediscontroller "github.com/XDcobra/go_license_key_api_template/controller/RedisController"
 	"github.com/XDcobra/go_license_key_api_template/database"
 	router "github.com/XDcobra/go_license_key_api_template/router"
 	"log"
@@ -29,13 +30,14 @@ func main() {
 	app := router.CreateServer()
 
 	// create controllers
+	dummyController := dummycontroller.NewDummyController()
 	redisController := rediscontroller.NewRedisController(redisClient)
 
 	// register routes
-	router := router.RegisterRoutes(app, redisController)
+	routerClient := router.RegisterRoutes(app, redisController, dummyController)
 
 	// start http server
-	err := router.Listen(":8000")
+	err := routerClient.Listen(":8000")
 	if err != nil {
 		panic(err)
 	} else {
