@@ -1,0 +1,144 @@
+services:
+  app:
+    build:
+      context: ./services/api_gateway
+      dockerfile: ./Dockerfile
+    container_name: api_gateway
+    hostname: api_gateway
+    networks:
+      redis-network:
+        aliases:
+          - api_gateway
+    links:
+      - redis
+      - redis-slave
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    depends_on:
+      - redis
+      - redis-slave
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    ports:
+      - 8000:8000
+    labels:
+      kompose.service.type: loadbalancer
+
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG
+      - REDIS_AOF_ENABLED=no
+    networks:
+      redis-network:
+        aliases:
+          - redis
+    volumes:
+      - redis-data:/bitnami/redis/data
+    ports:
+      - '6379:6379'
+
+  redis-slave:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=slave
+      - REDIS_MASTER_HOST=redis
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_AOF_ENABLED=no
+    ports:
+      - '6379'
+    depends_on:
+      - redis
+    networks:
+      redis-network:
+        aliases:
+          - redis-slave
+
+  redis-sentinel-1:
+    image: 'bitnami/redis-sentinel:latest'
+    hostname: redis-sentinel-1
+    container_name: redis-sentinel-1
+    environment:
+      - REDIS_SENTINEL_RESOLVE_HOSTNAMES=yes
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_AOF_ENABLED=no
+    depends_on:
+      - redis
+      - redis-slave
+    ports:
+      - '26379:26379'
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel-1
+
+  redis-sentinel-2:
+    image: 'bitnami/redis-sentinel:latest'
+    hostname: redis-sentinel-2
+    container_name: redis-sentinel-2
+    environment:
+      - REDIS_SENTINEL_RESOLVE_HOSTNAMES=yes
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_AOF_ENABLED=no
+    depends_on:
+      - redis
+      - redis-slave
+      - redis-sentinel-1
+    ports:
+      - '26380:26380'
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel-2
+
+  redis-sentinel-3:
+    image: 'bitnami/redis-sentinel:latest'
+    hostname: redis-sentinel-3
+    container_name: redis-sentinel-3
+    environment:
+      - REDIS_SENTINEL_RESOLVE_HOSTNAMES=yes
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_AOF_ENABLED=no
+    depends_on:
+      - redis
+      - redis-slave
+      - redis-sentinel-1
+      - redis-sentinel-2
+    ports:
+      - '26381:26381'
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel-3
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    hostname: redis-insight
+    networks:
+      redis-network:
+        aliases:
+          - redis-insight
+    volumes:
+      - redis-insight-data:/db
+    depends_on:
+      - redis
+      - redis-slave
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    ports:
+      - 5540:5540
+
+volumes:
+  redis-insight-data:
+  redis-data:
+
+networks:
+  redis-network:
+    driver: bridge
+
