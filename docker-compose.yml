@@ -134,9 +134,31 @@ services:
     ports:
       - 5540:5540
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    command: "--config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web.yml"
+    restart: unless-stopped
+    volumes:
+      - ./services/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./services/prometheus/web.yml:/etc/prometheus/web.yml
+      - prom-data:/prometheus
+    networks:
+      redis-network:
+        aliases:
+          - prometheus
+    links:
+      - app
+    depends_on:
+      - app
+    ports:
+      - 9090:9090
+
 volumes:
   redis-insight-data:
   redis-data:
+  prom-data:
 
 networks:
   redis-network:
