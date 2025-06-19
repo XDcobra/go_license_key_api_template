@@ -26,7 +26,7 @@ scrape_configs:
   metrics_path: /metrics
   scheme: http
   static_configs:
-  - targets: ["api_gateway:5000"]
+  - targets: ["api_gateway:8000"]
     labels:
       application: api_gateway
   basic_auth:
