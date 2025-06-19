@@ -16,8 +16,8 @@ scrape_configs:
       labels:
         application: prometheus
   basic_auth:
-    username: testuser
-    password: testpw
+    username: ${PROM_USER}
+    password: ${PROM_PASS}
 
 - job_name: "fiberprometheus"
   honor_timestamps: true
@@ -30,5 +30,5 @@ scrape_configs:
     labels:
       application: api_gateway
   basic_auth:
-    username: testuser
-    password: testpw
+    username: ${METRICS_USER}
+    password: ${METRICS_PASS}

@@ -1,0 +1,2 @@
+basic_auth_users:
+  ${PROM_USER}: ${PROM_PASS_BCRYPT}

@@ -3,6 +3,8 @@ services:
     build:
       context: ./services/api_gateway
       dockerfile: ./Dockerfile
+    env_file:
+      - .env
     container_name: api_gateway
     hostname: api_gateway
     networks:
@@ -135,14 +137,19 @@ services:
       - 5540:5540
 
   prometheus:
-    image: prom/prometheus:latest
+    build:
+      context: ./services/prometheus
+      dockerfile: ./Dockerfile
+      args:
+        METRICS_USER: ${METRICS_USER}
+        METRICS_PASS: ${METRICS_PASS}
+        PROM_USER: ${PROM_USER}
+        PROM_PASS: ${PROM_PASS}
     container_name: prometheus
     hostname: prometheus
     command: "--config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web.yml"
     restart: unless-stopped
     volumes:
-      - ./services/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./services/prometheus/web.yml:/etc/prometheus/web.yml
       - prom-data:/prometheus
     networks:
       redis-network:
