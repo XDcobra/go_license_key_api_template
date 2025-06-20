@@ -162,10 +162,38 @@ services:
     ports:
       - 9090:9090
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana1
+    volumes:
+      - ./services/grafana:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    networks:
+      redis-network:
+        aliases:
+          - grafana
+    links:
+      - redis
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+      - prometheus
+      - app
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+
 volumes:
   redis-insight-data:
   redis-data:
   prom-data:
+  grafana-data:
 
 networks:
   redis-network:
