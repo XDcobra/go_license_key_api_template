@@ -8,5 +8,5 @@ datasources:
     access: proxy
     editable: true
     basicAuth: true
-    basicAuthUser: testuser
-    basicAuthPassword: testpw
+    basicAuthUser: ${PROM_USER}
+    basicAuthPassword: ${PROM_PASS}
