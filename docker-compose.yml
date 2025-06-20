@@ -3,6 +3,8 @@ services:
     build:
       context: ./services/api_gateway
       dockerfile: ./Dockerfile
+    env_file:
+      - .env
     container_name: api_gateway
     hostname: api_gateway
     networks:
@@ -134,9 +136,67 @@ services:
     ports:
       - 5540:5540
 
+  prometheus:
+    build:
+      context: ./services/prometheus
+      dockerfile: ./Dockerfile
+      args:
+        METRICS_USER: ${METRICS_USER}
+        METRICS_PASS: ${METRICS_PASS}
+        PROM_USER: ${PROM_USER}
+        PROM_PASS: ${PROM_PASS}
+    container_name: prometheus
+    hostname: prometheus
+    command: "--config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web.yml"
+    restart: unless-stopped
+    volumes:
+      - prom-data:/prometheus
+    networks:
+      redis-network:
+        aliases:
+          - prometheus
+    links:
+      - app
+    depends_on:
+      - app
+    ports:
+      - 9090:9090
+
+  grafana:
+    build:
+      context: ./services/grafana
+      dockerfile: ./Dockerfile
+      args:
+        PROM_USER: ${PROM_USER}
+        PROM_PASS: ${PROM_PASS}
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      redis-network:
+        aliases:
+          - grafana
+    links:
+      - redis
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+      - prometheus
+      - app
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+
 volumes:
   redis-insight-data:
   redis-data:
+  prom-data:
+  grafana-data:
 
 networks:
   redis-network:
