@@ -61,22 +61,30 @@ A production-ready Go Fiber microservices template with Docker Compose orchestra
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/gofiber-starter-stack.git
+   git clone https://github.com/XDcobra/gofiber-starter-stack.git
    cd gofiber-starter-stack
    ```
 
-2. **Create environment file**
+2. **Initialize Go module (if needed)**
+   ```bash
+   cd services/api_gateway
+   go mod init github.com/XDcobra/gofiber-starter-stack
+   go mod tidy
+   cd ../..
+   ```
+
+3. **Create environment file**
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
-3. **Start all services**
+4. **Start all services**
    ```bash
    make docker-start
    ```
 
-4. **Access the services**
+5. **Access the services**
    - API Gateway: http://localhost:8000
    - Grafana: http://localhost:3000
    - Prometheus: http://localhost:9090
@@ -84,7 +92,7 @@ A production-ready Go Fiber microservices template with Docker Compose orchestra
    - MySQL: http://localhost:3306
 
 
-5. **For Production: Review Security settings**
+6. **For Production: Review Security settings**
    - Please read section [🔐 Authentication & Security](#-authentication--security) and change the passwords (and usernames)
 within the .env file, as well as reviewing the exposed service ports
 
