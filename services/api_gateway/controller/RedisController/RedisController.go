@@ -1,8 +1,8 @@
 package RedisController
 
 import (
-	"github.com/XDcobra/go_license_key_api_template/model"
-	"github.com/XDcobra/go_license_key_api_template/services"
+	RedisModels "github.com/XDcobra/go_license_key_api_template/model/Redis"
+	RedisService "github.com/XDcobra/go_license_key_api_template/services/Redis"
 	"github.com/redis/go-redis/v9"
 	"net/http"
 
@@ -24,39 +24,39 @@ func (n *RedisController) RedisControllerPing(c *fiber.Ctx) error {
 }
 
 func (n *RedisController) RedisControllerGet(c *fiber.Ctx) error {
-	var redisPayloadModel model.RedisPayloadModel
+	var redisPayloadModel RedisModels.RedisPayloadModel
 
 	// get request parameter
 	err := c.BodyParser(&redisPayloadModel)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(model.RedisGetResponseModel{Errors: err.Error()})
+		return c.Status(http.StatusBadRequest).JSON(RedisModels.RedisGetResponseModel{Errors: err.Error()})
 	}
 
 	// get key value from redis
-	keyValue, redisErr := services.GetKeyValues(n.rdb, redisPayloadModel.Key)
+	keyValue, redisErr := RedisService.GetKeyValues(n.rdb, redisPayloadModel.Key)
 	if redisErr != nil {
-		return c.Status(http.StatusBadRequest).JSON(model.RedisGetResponseModel{Errors: redisErr.Error()})
+		return c.Status(http.StatusBadRequest).JSON(RedisModels.RedisGetResponseModel{Errors: redisErr.Error()})
 	}
 
 	// return key value
-	return c.Status(http.StatusOK).JSON(model.RedisGetResponseModel{Key: redisPayloadModel.Key, Values: keyValue})
+	return c.Status(http.StatusOK).JSON(RedisModels.RedisGetResponseModel{Key: redisPayloadModel.Key, Values: keyValue})
 }
 
 func (n *RedisController) RedisControllerPost(c *fiber.Ctx) error {
-	var redisPayloadModel model.RedisPayloadModel
+	var redisPayloadModel RedisModels.RedisPayloadModel
 
 	// get request parameter
 	err := c.BodyParser(&redisPayloadModel)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(model.RedisPostResponseModel{Errors: "Body parser: " + err.Error()})
+		return c.Status(http.StatusBadRequest).JSON(RedisModels.RedisPostResponseModel{Errors: "Body parser: " + err.Error()})
 	}
 
 	// set key value in redis
-	redisErr := services.SetKeyValue(n.rdb, redisPayloadModel.Key, redisPayloadModel.Value)
+	redisErr := RedisService.SetKeyValue(n.rdb, redisPayloadModel.Key, redisPayloadModel.Value)
 	if redisErr != nil {
-		return c.Status(http.StatusBadRequest).JSON(model.RedisPostResponseModel{Errors: "Setting in rdb: " + redisErr.Error()})
+		return c.Status(http.StatusBadRequest).JSON(RedisModels.RedisPostResponseModel{Errors: "Setting in rdb: " + redisErr.Error()})
 	}
 
 	// return ok
-	return c.Status(http.StatusOK).JSON(model.RedisPostResponseModel{Key: redisPayloadModel.Key, Value: redisPayloadModel.Value})
+	return c.Status(http.StatusOK).JSON(RedisModels.RedisPostResponseModel{Key: redisPayloadModel.Key, Value: redisPayloadModel.Value})
 }
