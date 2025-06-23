@@ -1,7 +1,7 @@
 package router
 
 import (
-	prom "github.com/XDcobra/go_license_key_api_template/prometheus"
+	prom "github.com/XDcobra/gofiber-starter-stack/prometheus"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"os"

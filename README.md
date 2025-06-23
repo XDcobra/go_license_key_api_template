@@ -1,8 +1,10 @@
 # GoFiber Starter Stack
 
-A production-ready Go Fiber microservices template with Docker Compose orchestration, featuring Redis clustering, MySQL database, Prometheus monitoring, and Grafana visualization.
+🚀 Production-ready Go Fiber microservices template with Docker Compose, Redis clustering, MySQL, Prometheus monitoring, and Grafana visualization.
 
 ---
+
+A production-ready Go Fiber microservices template with Docker Compose orchestration, featuring Redis clustering, MySQL database, Prometheus monitoring, and Grafana visualization.
 
 ## 🚀 Features
 
@@ -89,7 +91,7 @@ A production-ready Go Fiber microservices template with Docker Compose orchestra
    - Grafana: http://localhost:3000
    - Prometheus: http://localhost:9090
    - Redis Insight: http://localhost:5540
-   - MySQL: http://localhost:3306
+   - MySQL: localhost:3306
 
 
 6. **For Production: Review Security settings**

@@ -1,8 +1,8 @@
 package RedisController
 
 import (
-	RedisModels "github.com/XDcobra/go_license_key_api_template/model/Redis"
-	RedisService "github.com/XDcobra/go_license_key_api_template/services/Redis"
+	RedisModels "github.com/XDcobra/gofiber-starter-stack/model/Redis"
+	RedisService "github.com/XDcobra/gofiber-starter-stack/services/Redis"
 	"github.com/redis/go-redis/v9"
 	"net/http"
 

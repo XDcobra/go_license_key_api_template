@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	dummycontroller "github.com/XDcobra/go_license_key_api_template/controller/DummyController"
-	mysqlcontroller "github.com/XDcobra/go_license_key_api_template/controller/MySQLController"
-	rediscontroller "github.com/XDcobra/go_license_key_api_template/controller/RedisController"
-	dbmanagementMySQL "github.com/XDcobra/go_license_key_api_template/database/MySQL"
-	dbmanagementRedis "github.com/XDcobra/go_license_key_api_template/database/Redis"
-	router "github.com/XDcobra/go_license_key_api_template/router"
+	dummycontroller "github.com/XDcobra/gofiber-starter-stack/controller/DummyController"
+	mysqlcontroller "github.com/XDcobra/gofiber-starter-stack/controller/MySQLController"
+	rediscontroller "github.com/XDcobra/gofiber-starter-stack/controller/RedisController"
+	dbmanagementMySQL "github.com/XDcobra/gofiber-starter-stack/database/MySQL"
+	dbmanagementRedis "github.com/XDcobra/gofiber-starter-stack/database/Redis"
+	router "github.com/XDcobra/gofiber-starter-stack/router"
 	"log"
 )
 

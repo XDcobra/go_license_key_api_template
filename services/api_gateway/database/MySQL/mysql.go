@@ -2,7 +2,7 @@ package MySQL
 
 import (
 	"fmt"
-	MySQlModels "github.com/XDcobra/go_license_key_api_template/model/MySQL"
+	MySQlModels "github.com/XDcobra/gofiber-starter-stack/model/MySQL"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
