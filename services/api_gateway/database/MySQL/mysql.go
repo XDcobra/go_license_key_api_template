@@ -6,10 +6,11 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 func ConnectionMySQLDB() *gorm.DB {
-	dsn := "user:password@tcp(mysql:3306)/example_db?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_DATABASE"))
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Error while connecting to MySQL Database: %v", err)
@@ -23,7 +24,7 @@ func ConnectionMySQLDB() *gorm.DB {
 	if err := sqlDB.Ping(); err != nil {
 		log.Fatalf("Database not reachable: %v", err)
 	} else {
-		fmt.Println("Connected to MySQL")
+		log.Println("Connected to MySQL")
 	}
 
 	return db
