@@ -24,12 +24,12 @@ services:
       - redis-sentinel-2
       - redis-sentinel-3
     ports:
-      - 8000:8000
+      - "8000:8000"
     labels:
       kompose.service.type: loadbalancer
 
   redis:
-    image: 'bitnami/redis:latest'
+    image: "bitnami/redis:latest"
     environment:
       - REDIS_REPLICATION_MODE=master
       - ALLOW_EMPTY_PASSWORD=yes
@@ -42,17 +42,17 @@ services:
     volumes:
       - redis-data:/bitnami/redis/data
     ports:
-      - '6379:6379'
+      - "6379:6379"
 
   redis-slave:
-    image: 'bitnami/redis:latest'
+    image: "bitnami/redis:latest"
     environment:
       - REDIS_REPLICATION_MODE=slave
       - REDIS_MASTER_HOST=redis
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_AOF_ENABLED=no
     ports:
-      - '6379'
+      - "6379"
     depends_on:
       - redis
     networks:
@@ -61,7 +61,7 @@ services:
           - redis-slave
 
   redis-sentinel-1:
-    image: 'bitnami/redis-sentinel:latest'
+    image: "bitnami/redis-sentinel:latest"
     hostname: redis-sentinel-1
     container_name: redis-sentinel-1
     environment:
@@ -72,14 +72,14 @@ services:
       - redis
       - redis-slave
     ports:
-      - '26379:26379'
+      - "26379:26379"
     networks:
       redis-network:
         aliases:
           - redis-sentinel-1
 
   redis-sentinel-2:
-    image: 'bitnami/redis-sentinel:latest'
+    image: "bitnami/redis-sentinel:latest"
     hostname: redis-sentinel-2
     container_name: redis-sentinel-2
     environment:
@@ -91,14 +91,14 @@ services:
       - redis-slave
       - redis-sentinel-1
     ports:
-      - '26380:26380'
+      - "26380:26380"
     networks:
       redis-network:
         aliases:
           - redis-sentinel-2
 
   redis-sentinel-3:
-    image: 'bitnami/redis-sentinel:latest'
+    image: "bitnami/redis-sentinel:latest"
     hostname: redis-sentinel-3
     container_name: redis-sentinel-3
     environment:
@@ -111,14 +111,14 @@ services:
       - redis-sentinel-1
       - redis-sentinel-2
     ports:
-      - '26381:26381'
+      - "26381:26381"
     networks:
       redis-network:
         aliases:
           - redis-sentinel-3
 
   redis-insight:
-    image: redislabs/redisinsight:latest
+    image: "redislabs/redisinsight:latest"
     container_name: redis-insight
     hostname: redis-insight
     networks:
@@ -134,7 +134,7 @@ services:
       - redis-sentinel-2
       - redis-sentinel-3
     ports:
-      - 5540:5540
+      - "5540:5540"
 
   prometheus:
     build:
@@ -160,7 +160,7 @@ services:
     depends_on:
       - app
     ports:
-      - 9090:9090
+      - "9090:9090"
 
   grafana:
     build:
@@ -190,13 +190,33 @@ services:
     depends_on:
       - prometheus
     ports:
-      - 3000:3000
+      - "3000:3000"
+
+  mysql:
+    image: "mysql:latest"
+    container_name: mysql
+    env_file:
+      - .env
+    volumes:
+      - ./services/mysql/init.sql:/docker-entrypoint-initdb.d/db.sql
+      - mysql-data:/var/lib/mysql
+    networks:
+      redis-network:
+        aliases:
+          - mysql
+    links:
+      - app
+    depends_on:
+      - app
+    ports:
+      - "3306:3306"
 
 volumes:
   redis-insight-data:
   redis-data:
   prom-data:
   grafana-data:
+  mysql-data:
 
 networks:
   redis-network:

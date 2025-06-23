@@ -1,4 +1,4 @@
-package model
+package Redis
 
 type RedisPayloadModel struct {
 	// Redis Key
