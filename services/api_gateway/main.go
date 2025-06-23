@@ -23,7 +23,7 @@ func main() {
 	// create connection to redis database
 	redisClient := database.ConnectionRedisDB()
 
-	// check connection
+	// check redis connection
 	if err := redisClient.Ping(ctx).Err(); err != nil {
 		log.Fatal(err)
 	} else {
@@ -35,6 +35,17 @@ func main() {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Error while connecting to MySQL Database: %v", err)
+	}
+
+	// check mysql database connection
+	sqlDB, err := db.DB() // get underlying *sql.DB
+	if err != nil {
+		log.Fatalf("Unable to get raw DB: %v", err)
+	}
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatalf("Database not reachable: %v", err)
+	} else {
+		fmt.Println("Connected to MySQL")
 	}
 
 	// do automigration
