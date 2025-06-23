@@ -1,10 +1,8 @@
 # GoFiber Starter Stack
 
-🚀 Production-ready Go Fiber microservices template with Docker Compose, Redis clustering, MySQL, Prometheus monitoring, and Grafana visualization.
+🚀 A production-ready Go Fiber microservices template with Docker Compose orchestration, featuring Redis clustering, MySQL database, Prometheus monitoring, and Grafana visualization.
 
 ---
-
-A production-ready Go Fiber microservices template with Docker Compose orchestration, featuring Redis clustering, MySQL database, Prometheus monitoring, and Grafana visualization.
 
 ## 🚀 Features
 
