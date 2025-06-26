@@ -11,7 +11,7 @@ RUN go mod download
 ADD . ./
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /api_gateway
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api-gateway
 
 # Expose Port
 EXPOSE 8000
@@ -19,4 +19,4 @@ EXPOSE 8000
 #ENV DEV=FALSE
 
 # Run
-CMD ["/api_gateway"]
+CMD ["/api-gateway"]
