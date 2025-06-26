@@ -26,9 +26,9 @@ scrape_configs:
   metrics_path: /metrics
   scheme: http
   static_configs:
-  - targets: ["api_gateway:8000"]
+  - targets: ["api-gateway:8000"]
     labels:
-      application: api_gateway
+      application: api-gateway
   basic_auth:
     username: ${METRICS_USER}
     password: ${METRICS_PASS}
