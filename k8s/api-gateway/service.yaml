@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
+    kompose.service.type: loadbalancer
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: api-gateway-tcp
+  name: api-gateway-tcp
+spec:
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+  selector:
+    io.kompose.service: api-gateway
+  type: LoadBalancer
