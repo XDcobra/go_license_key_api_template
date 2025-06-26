@@ -67,7 +67,7 @@
 
 2. **Initialize Go module (if needed)**
    ```bash
-   cd services/api_gateway
+   cd services/api-gateway
    go mod init github.com/XDcobra/gofiber-starter-stack
    go mod tidy
    cd ../..
@@ -107,7 +107,7 @@ gofiber-starter-stack/
 ├── README.md                       # This file
 ├── .env.example                    # Environment variables template
 └── services/
-    ├── api_gateway/                # Go Fiber API Gateway
+    ├── api-gateway/                # Go Fiber API Gateway
     │   ├── controller/             # HTTP controllers
     │   │   ├── DummyController/    # Example controller
     │   │   ├── MySQLController/    # MySQL operations
@@ -240,7 +240,7 @@ make docker-down
 docker-compose logs -f
 
 # Rebuild specific service
-docker-compose build api_gateway
+docker-compose build api-gateway
 ```
 
 ---
@@ -254,7 +254,7 @@ The API Gateway automatically exposes metrics at `/metrics` endpoint:
 - Active connections
 - Custom business metrics
 
-In case you want to expose more custom metrics, consider to add these into the [Gofiber-Prometheus](./services/api_gateway/prometheus/fiberprometheus.go) file
+In case you want to expose more custom metrics, consider to add these into the [Gofiber-Prometheus](./services/api-gateway/prometheus/fiberprometheus.go) file
 
 ### Grafana Dashboards
 Pre-configured dashboards for:
