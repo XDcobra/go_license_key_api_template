@@ -1,16 +1,17 @@
 services:
-  app:
+  api-gateway:
     build:
-      context: ./services/api_gateway
+      context: ./services/api-gateway
       dockerfile: ./Dockerfile
     env_file:
       - .env
-    container_name: api_gateway
-    hostname: api_gateway
+    image: api-gateway:latest
+    container_name: api-gateway
+    hostname: api-gateway
     networks:
       redis-network:
         aliases:
-          - api_gateway
+          - api-gateway
     links:
       - redis
       - redis-slave
@@ -145,6 +146,7 @@ services:
         METRICS_PASS: ${METRICS_PASS}
         PROM_USER: ${PROM_USER}
         PROM_PASS: ${PROM_PASS}
+    image: prometheus:latest
     container_name: prometheus
     hostname: prometheus
     command: "--config.file=/etc/prometheus/prometheus.yml --web.config.file=/etc/prometheus/web.yml"
@@ -156,9 +158,9 @@ services:
         aliases:
           - prometheus
     links:
-      - app
+      - api-gateway
     depends_on:
-      - app
+      - api-gateway
     ports:
       - "9090:9090"
 
@@ -169,6 +171,7 @@ services:
       args:
         PROM_USER: ${PROM_USER}
         PROM_PASS: ${PROM_PASS}
+    image: grafana:latest
     container_name: grafana
     hostname: grafana
     restart: unless-stopped
@@ -186,7 +189,7 @@ services:
       - redis-sentinel-2
       - redis-sentinel-3
       - prometheus
-      - app
+      - api-gateway
     depends_on:
       - prometheus
     ports:
@@ -205,9 +208,9 @@ services:
         aliases:
           - mysql
     links:
-      - app
+      - api-gateway
     depends_on:
-      - app
+      - api-gateway
     ports:
       - "3306:3306"
 
