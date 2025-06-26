@@ -10,7 +10,7 @@ import (
 func CreateServer() *fiber.App {
 	app := fiber.New()
 
-	prometheus := prom.New("api_gateway")
+	prometheus := prom.New("api-gateway")
 	prometheus.RegisterAt(app, "/metrics", basicauth.New(basicauth.Config{
 		Users: map[string]string{
 			os.Getenv("METRICS_USER"): os.Getenv("METRICS_PASS"),
