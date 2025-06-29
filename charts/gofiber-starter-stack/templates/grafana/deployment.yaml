@@ -1,43 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
-    kompose.version: 1.36.0 (ae2a39403)
+  name: {{ printf "%s-grafana" .Release.Name }}
   labels:
-    io.kompose.service: grafana
-  name: grafana
+    app: {{ printf "%s-grafana" .Release.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.grafana.replicaCount }}
   selector:
     matchLabels:
-      io.kompose.service: grafana
+      app: {{ printf "%s-grafana" .Release.Name }}
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
-        kompose.version: 1.36.0 (ae2a39403)
       labels:
-        io.kompose.service: grafana
+        app: {{ printf "%s-grafana" .Release.Name }}
     spec:
       containers:
-        - envFrom:
-            - configMapRef:
-                name: env
-          image: grafana:latest
-          name: grafana
-          imagePullPolicy: Never
+        - name: grafana
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ printf "%s-grafana-admin" .Release.Name }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.grafana.service.port }}
               protocol: TCP
           volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: grafana-data
-      hostname: grafana
-      restartPolicy: Always
+            - name: grafana-data
+              mountPath: /var/lib/grafana
       volumes:
         - name: grafana-data
           persistentVolumeClaim:
-            claimName: grafana-data
+            claimName: {{ printf "%s-grafana-data" .Release.Name }}

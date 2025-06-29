@@ -1,0 +1,102 @@
+apiGateway:
+  replicaCount: 1
+  image:
+    repository: localhost:5000/api-gateway
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: LoadBalancer
+    port: 8000
+    targetPort: 8000
+env:
+  # Name of ConfigMap providing env vars
+  configMapName: env
+
+mysql:
+  replicaCount: 1
+  image:
+    repository: mysql
+    tag: "8"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3306
+    targetPort: 3306
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 100Mi
+  initConfigMapName: mysql-init
+
+grafana:
+  replicaCount: 1
+  image:
+    repository: grafana
+    tag: "latest"
+    pullPolicy: Never
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 100Mi
+
+prometheus:
+  replicaCount: 1
+  image:
+    repository: prometheus
+    tag: "latest"
+    pullPolicy: Never
+  service:
+    type: ClusterIP
+    port: 9090
+    targetPort: 9090
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 100Mi
+
+redis:
+  replicaCount: 1              # Master replica
+  master:
+    port: 6379
+  slave:
+    replicaCount: 1            # Slave replica
+  sentinel:
+    replicaCount: 3
+    port: 26379
+    quorum: 2
+  insight:
+    replicaCount: 1            # Redis Insight instance
+  image:
+    repository: bitnami/redis
+    tag: latest
+    pullPolicy: IfNotPresent
+  sentinelImage:
+    repository: bitnami/redis-sentinel
+    tag: latest
+    pullPolicy: IfNotPresent
+  insightImage:
+    repository: redislabs/redisinsight
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    masterPort: 6379
+    slavePort: 6379
+    insightPort: 5540
+  persistence:
+    master:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 100Mi
+    insight:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 100Mi
+  env:
+    allowEmptyPassword: "yes"
+    aofEnabled: "no"
+    disableCommands: "FLUSHDB,FLUSHALL,CONFIG"

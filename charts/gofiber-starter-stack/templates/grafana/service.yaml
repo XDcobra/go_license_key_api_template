@@ -1,16 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
-    kompose.version: 1.36.0 (ae2a39403)
+  name: {{ printf "%s-grafana" .Release.Name }}
   labels:
-    io.kompose.service: grafana
-  name: grafana
+    app: {{ printf "%s-grafana" .Release.Name }}
 spec:
-  ports:
-    - name: "3000"
-      port: 3000
-      targetPort: 3000
+  type: {{ .Values.grafana.service.type }}
   selector:
-    io.kompose.service: grafana
+    app: {{ printf "%s-grafana" .Release.Name }}
+  ports:
+    - name: http
+      port: {{ .Values.grafana.service.port }}
+      targetPort: {{ .Values.grafana.service.targetPort }}

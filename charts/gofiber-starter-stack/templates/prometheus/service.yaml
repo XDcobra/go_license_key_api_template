@@ -1,16 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
-    kompose.version: 1.36.0 (ae2a39403)
+  name: {{ printf "%s-prometheus" .Release.Name }}
   labels:
-    io.kompose.service: prometheus
-  name: prometheus
+    app: {{ printf "%s-prometheus" .Release.Name }}
 spec:
-  ports:
-    - name: "9090"
-      port: 9090
-      targetPort: 9090
+  type: {{ .Values.prometheus.service.type }}
   selector:
-    io.kompose.service: prometheus
+    app: {{ printf "%s-prometheus" .Release.Name }}
+  ports:
+    - name: http
+      port: {{ .Values.prometheus.service.port }}
+      targetPort: {{ .Values.prometheus.service.targetPort }}

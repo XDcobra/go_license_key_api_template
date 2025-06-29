@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: {{ printf "%s-mysql-data" .Release.Name }}
   labels:
-    io.kompose.service: mysql-data
-  name: mysql-data
+    app: {{ printf "%s-mysql-data" .Release.Name }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.mysql.persistence.accessMode }}
   resources:
     requests:
-      storage: 100Mi
+      storage: {{ .Values.mysql.persistence.size }}

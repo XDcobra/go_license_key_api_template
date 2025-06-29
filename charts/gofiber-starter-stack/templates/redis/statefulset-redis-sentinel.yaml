@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ printf "%s-redis-sentinel" .Release.Name }}
+  labels:
+    app: {{ printf "%s-redis-sentinel" .Release.Name }}
+spec:
+  serviceName: {{ printf "%s-redis-sentinel-headless" .Release.Name }}
+  replicas: {{ .Values.redis.sentinel.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-redis-sentinel" .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-redis-sentinel" .Release.Name }}
+    spec:
+      containers:
+        - name: redis-sentinel
+          image: "{{ .Values.redis.sentinelImage.repository }}:{{ .Values.redis.sentinelImage.tag }}"
+          imagePullPolicy: {{ .Values.redis.sentinelImage.pullPolicy }}
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: {{ .Values.redis.env.allowEmptyPassword | quote }}
+            - name: REDIS_AOF_ENABLED
+              value: {{ .Values.redis.env.aofEnabled | quote }}
+            - name: REDIS_SENTINEL_RESOLVE_HOSTNAMES
+              value: "yes"
+            - name: REDIS_MASTER_HOST
+              value: {{ printf "%s-redis-master" .Release.Name | quote }}
+            - name: REDIS_MASTER_PORT
+              value: {{ .Values.redis.master.port | quote }}
+            - name: REDIS_SENTINEL_QUORUM
+              value: {{ .Values.redis.sentinel.quorum | quote }}
+          ports:
+            - containerPort: {{ .Values.redis.sentinel.port }}
+              name: sentinel
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate

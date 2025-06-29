@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-redis-insight-data" .Release.Name }}
+  labels:
+    app: {{ printf "%s-redis-insight-data" .Release.Name }}
+spec:
+  accessModes:
+    - {{ .Values.redis.persistence.insight.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.redis.persistence.insight.size }}
