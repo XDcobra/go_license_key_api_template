@@ -107,12 +107,17 @@ ingress:
   annotations: {}
   host: localhost
   rewritePaths:
-    - path: /api(/|$)(.*)
+    - path: /api/(?!swagger)(.*)
       pathType: ImplementationSpecific
       service:
         name: api-gateway-tcp
         port: 8000
   prefixPaths:
+    - path: /api/swagger
+      pathType: Prefix
+      service:
+        name: api-gateway-tcp
+        port: 8000
     - path: /grafana
       pathType: Prefix
       service:
