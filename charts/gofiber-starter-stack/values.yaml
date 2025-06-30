@@ -8,9 +8,6 @@ apiGateway:
     type: LoadBalancer
     port: 8000
     targetPort: 8000
-env:
-  # Name of ConfigMap providing env vars
-  configMapName: env
 
 mysql:
   replicaCount: 1
@@ -42,6 +39,7 @@ grafana:
     enabled: true
     accessMode: ReadWriteOnce
     size: 100Mi
+  path: "http://localhost/grafana"
 
 prometheus:
   replicaCount: 1
@@ -57,6 +55,8 @@ prometheus:
     enabled: true
     accessMode: ReadWriteOnce
     size: 100Mi
+  ingressPath: /prometheus
+  externalUrl: /prometheus
 
 redis:
   replicaCount: 1              # Master replica
@@ -100,3 +100,28 @@ redis:
     allowEmptyPassword: "yes"
     aofEnabled: "no"
     disableCommands: "FLUSHDB,FLUSHALL,CONFIG"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  host: localhost
+  rewritePaths:
+    - path: /api(/|$)(.*)
+      pathType: ImplementationSpecific
+      service:
+        name: api-gateway-tcp
+        port: 8000
+  prefixPaths:
+    - path: /grafana
+      pathType: Prefix
+      service:
+        name: grafana
+        port: 3000
+    - path: /prometheus
+      pathType: Prefix
+      service:
+        name: prometheus
+        port: 9090
+  tls: []
+

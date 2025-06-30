@@ -21,8 +21,9 @@ spec:
           image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
           imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
           args:
-            - --config.file=/etc/prometheus/prometheus.yml
-            - --web.config.file=/etc/prometheus/web.yml
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--web.config.file=/etc/prometheus/web.yml"
+            - "--web.external-url={{ .Values.prometheus.externalUrl }}"
           ports:
             - containerPort: {{ .Values.prometheus.service.port }}
               protocol: TCP

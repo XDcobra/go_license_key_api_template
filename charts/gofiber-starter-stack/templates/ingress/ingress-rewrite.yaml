@@ -1,0 +1,29 @@
+{{- if and .Values.ingress.enabled (gt (len .Values.ingress.rewritePaths) 0) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress-rewrite
+  labels:
+    app: {{ .Release.Name }}-ingress-rewrite
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    {{- range $k,$v := .Values.ingress.annotations }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          {{- range .Values.ingress.rewritePaths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ printf "%s-%s" $.Release.Name .service.name }}
+                port:
+                  number: {{ .service.port }}
+          {{- end }}
+{{- end }}
