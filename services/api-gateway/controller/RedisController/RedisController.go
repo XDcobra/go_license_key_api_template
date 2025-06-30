@@ -19,6 +19,12 @@ func NewRedisController(rdb *redis.Client) *RedisController {
 	}
 }
 
+// @Summary      API
+// @Description  Returns a Pong if api is running correctly
+// @Tags         Ping Pong
+// @Produce      plain
+// @Success 200 return Pong
+// @Router       /api/ [get]
 func (n *RedisController) RedisControllerPing(c *fiber.Ctx) error {
 	return c.SendString("Redis Controller Pong")
 }
