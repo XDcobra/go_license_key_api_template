@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-redis-insight" .Release.Name }}
+  labels:
+    app: {{ printf "%s-redis-insight" .Release.Name }}
+spec:
+  replicas: {{ .Values.redis.insight.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-redis-insight" .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-redis-insight" .Release.Name }}
+    spec:
+      containers:
+        - name: redis-insight
+          image: "{{ .Values.redis.insightImage.repository }}:{{ .Values.redis.insightImage.tag }}"
+          imagePullPolicy: {{ .Values.redis.insightImage.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.redis.service.insightPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: redis-insight-data
+              mountPath: /db
+      volumes:
+        - name: redis-insight-data
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-redis-insight-data" .Release.Name }}

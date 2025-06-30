@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-mysql" .Release.Name }}
+  labels:
+    app: {{ printf "%s-mysql" .Release.Name }}
+spec:
+  replicas: {{ .Values.mysql.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-mysql" .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-mysql" .Release.Name }}
+    spec:
+      containers:
+        - name: mysql
+          image: "{{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}"
+          imagePullPolicy: {{ .Values.mysql.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ printf "%s-mysql-passwords" .Release.Name }}
+          env:
+            - name: MYSQL_AUTHENTICATION_PLUGIN
+              value: "caching_sha2_password"
+          ports:
+            - containerPort: {{ .Values.mysql.service.port }}
+          volumeMounts:
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d/db.sql
+              subPath: db.sql
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-init
+          configMap:
+            name: {{ printf "%s-%s" .Release.Name .Values.mysql.initConfigMapName }}
+            items:
+              - key: init.sql
+                path: db.sql
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-mysql-data" .Release.Name }}

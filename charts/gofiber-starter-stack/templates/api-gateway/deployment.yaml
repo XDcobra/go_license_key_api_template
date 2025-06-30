@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-api-gateway
+  labels:
+    app: {{ .Release.Name }}-api-gateway
+spec:
+  replicas: {{ .Values.apiGateway.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-api-gateway
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-api-gateway
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-api-gateway
+          image: "{{ .Values.apiGateway.image.repository }}:{{ .Values.apiGateway.image.tag }}"
+          imagePullPolicy: {{ .Values.apiGateway.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.apiGateway.service.port }}
+          envFrom:
+            - secretRef:
+                name: {{ printf "%s-api-gateway-metrics" .Release.Name }}
+            - secretRef:
+                name: {{ printf "%s-grafana-admin" .Release.Name }}
+            - secretRef:
+                name: {{ printf "%s-mysql-passwords" .Release.Name }}
+            - secretRef:
+                name: {{ printf "%s-prometheus-user" .Release.Name }}
+          env:
+            - name: MYSQL_HOST
+              value: {{ printf "%s-mysql" .Release.Name | quote }}
+            - name: MYSQL_PORT
+              value: {{ .Values.mysql.service.port | quote }}

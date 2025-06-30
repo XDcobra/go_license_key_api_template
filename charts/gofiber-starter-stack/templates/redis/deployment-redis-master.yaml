@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-redis-master" .Release.Name }}
+  labels:
+    app: {{ printf "%s-redis-master" .Release.Name }}
+spec:
+  replicas: {{ .Values.redis.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-redis-master" .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-redis-master" .Release.Name }}
+    spec:
+      containers:
+        - name: redis-master
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: {{ .Values.redis.env.allowEmptyPassword | quote }}
+            - name: REDIS_AOF_ENABLED
+              value: {{ .Values.redis.env.aofEnabled | quote }}
+            - name: REDIS_DISABLE_COMMANDS
+              value: {{ .Values.redis.env.disableCommands | quote }}
+            - name: REDIS_REPLICATION_MODE
+              value: "master"
+          ports:
+            - containerPort: {{ .Values.redis.service.masterPort }}
+          volumeMounts:
+            - name: redis-data
+              mountPath: /bitnami/redis/data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-redis-data" .Release.Name }}

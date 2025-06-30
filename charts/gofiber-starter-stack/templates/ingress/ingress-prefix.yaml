@@ -1,0 +1,27 @@
+{{- if and .Values.ingress.enabled (gt (len .Values.ingress.prefixPaths) 0) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress-prefix
+  labels:
+    app: {{ .Release.Name }}-ingress-prefix
+  annotations:
+    {{- range $k,$v := .Values.ingress.annotations }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          {{- range .Values.ingress.prefixPaths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ printf "%s-%s" $.Release.Name .service.name }}
+                port:
+                  number: {{ .service.port }}
+          {{- end }}
+{{- end }}

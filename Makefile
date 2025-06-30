@@ -14,8 +14,18 @@ docker-down:
 		-f "docker-compose.yml" \
 		down
 
+docker-build:
+	docker-compose build
+	docker push localhost:5000/api-gateway:latest
 
 # Kubernetes locally
+# Starting local dev helm for the first time
+first-start:
+	minikube start	# start minikube
+	minikube addons enable ingress	# enable ingress for helm later
+	kube-env # set minikube context
+
+
 # Set Docker to use Minikube's environment
 kube-env:
 	powershell -Command "minikube -p minikube docker-env | Invoke-Expression"
@@ -29,6 +39,21 @@ kube-build:
 	kube-env
 	docker-compose build
 
-# Reload all pods
+# Reloads
 kube-reload:
 	kubectl rollout restart deployment
+
+helm-reload:
+	helm upgrade --install gofiber-starter-stack ./charts/gofiber-starter-stack \
+      -f ./charts/gofiber-starter-stack/values.yaml \
+      -f ./charts/gofiber-starter-stack/secret-values.yaml
+
+test:
+	helm template gofiber-starter-stack ./charts/gofiber-starter-stack \
+      -f charts/gofiber-starter-stack/values.yaml \
+      -f charts/gofiber-starter-stack/secret-values.yaml \
+    > rendered.yaml
+
+local-reg:
+	kubectl port-forward --namespace kube-system service/registry 5000:80
+	docker run --rm -it --network=host alpine ash -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:host.docker.internal:5000"

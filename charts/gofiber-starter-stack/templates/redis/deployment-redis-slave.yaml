@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-redis-slave" .Release.Name }}
+  labels:
+    app: {{ printf "%s-redis-slave" .Release.Name }}
+spec:
+  replicas: {{ .Values.redis.slave.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-redis-slave" .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-redis-slave" .Release.Name }}
+    spec:
+      containers:
+        - name: redis-slave
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: {{ .Values.redis.env.allowEmptyPassword | quote }}
+            - name: REDIS_AOF_ENABLED
+              value: {{ .Values.redis.env.aofEnabled | quote }}
+            - name: REDIS_MASTER_HOST
+              value: {{ printf "%s-redis-master" .Release.Name }}
+            - name: REDIS_REPLICATION_MODE
+              value: "slave"
+          ports:
+            - containerPort: {{ .Values.redis.service.slavePort }}

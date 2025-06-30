@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-prometheus" .Release.Name }}
+  labels:
+    app: {{ printf "%s-prometheus" .Release.Name }}
+spec:
+  replicas: {{ .Values.prometheus.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-prometheus" .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-prometheus" .Release.Name }}
+    spec:
+      containers:
+        - name: prometheus
+          image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
+          imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--web.config.file=/etc/prometheus/web.yml"
+            - "--web.external-url={{ .Values.prometheus.externalUrl }}"
+          ports:
+            - containerPort: {{ .Values.prometheus.service.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: prom-data
+              mountPath: /prometheus
+      volumes:
+        - name: prom-data
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-prom-data" .Release.Name }}

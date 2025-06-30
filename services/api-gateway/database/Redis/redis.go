@@ -15,7 +15,7 @@ func ConnectionRedisDB() *redis.Client {
 	// connect to redis
 	rdb = redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    "mymaster",
-		SentinelAddrs: []string{"redis-sentinel-1:26379", "redis-sentinel-2:26380", "redis-sentinel-3:26381"},
+		SentinelAddrs: []string{"gofiber-starter-stack-redis-sentinel-headless:26379"},
 	})
 
 	// check redis connection

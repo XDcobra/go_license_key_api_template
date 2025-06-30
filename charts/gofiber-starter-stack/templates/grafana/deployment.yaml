@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-grafana" .Release.Name }}
+  labels:
+    app: {{ printf "%s-grafana" .Release.Name }}
+spec:
+  replicas: {{ .Values.grafana.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-grafana" .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-grafana" .Release.Name }}
+    spec:
+      containers:
+        - name: grafana
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ printf "%s-grafana-admin" .Release.Name }}
+          env:
+            - name: GF_SERVER_ROOT_URL
+              value: {{ .Values.grafana.path }}
+            - name: GF_SERVER_SERVE_FROM_SUB_PATH
+              value: "true"
+          ports:
+            - containerPort: {{ .Values.grafana.service.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: grafana-data
+              mountPath: /var/lib/grafana
+      volumes:
+        - name: grafana-data
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-grafana-data" .Release.Name }}
