@@ -4,6 +4,11 @@ metadata:
   name: {{ .Release.Name }}-api-gateway-tcp
   labels:
     app: {{ .Release.Name }}-api-gateway-tcp
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: {{ .Values.apiGateway.service.port | quote }}
+    prometheus.io/scheme: "http"
 spec:
   type: {{ .Values.apiGateway.service.type }}
   selector:

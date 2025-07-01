@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-prometheus-web-config" .Release.Name }}
+  labels:
+    app: {{ printf "%s-prometheus" .Release.Name }}
+data:
+  web.yml: |-
+    basic_auth_users:
+      {{ .Values.prometheus.promUsername | quote }}: {{ .Values.prometheus.promHash | quote }}

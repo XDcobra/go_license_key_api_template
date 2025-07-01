@@ -4,6 +4,11 @@ metadata:
   name: {{ printf "%s-prometheus" .Release.Name }}
   labels:
     app: {{ printf "%s-prometheus" .Release.Name }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/prometheus/metrics"
+    prometheus.io/port: {{ .Values.prometheus.service.port | quote }}
+    prometheus.io/scheme: "http"
 spec:
   type: {{ .Values.prometheus.service.type }}
   selector:
