@@ -34,7 +34,12 @@ spec:
           volumeMounts:
             - name: grafana-data
               mountPath: /var/lib/grafana
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
       volumes:
         - name: grafana-data
           persistentVolumeClaim:
             claimName: {{ printf "%s-grafana-data" .Release.Name }}
+        - name: grafana-datasources
+          configMap:
+            name: {{ printf "%s-grafana-datasources" .Release.Name }}

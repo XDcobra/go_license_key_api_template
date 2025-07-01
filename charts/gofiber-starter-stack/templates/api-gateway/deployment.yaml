@@ -22,13 +22,9 @@ spec:
             - containerPort: {{ .Values.apiGateway.service.port }}
           envFrom:
             - secretRef:
-                name: {{ printf "%s-api-gateway-metrics" .Release.Name }}
-            - secretRef:
                 name: {{ printf "%s-grafana-admin" .Release.Name }}
             - secretRef:
                 name: {{ printf "%s-mysql-passwords" .Release.Name }}
-            - secretRef:
-                name: {{ printf "%s-prometheus-user" .Release.Name }}
           env:
             - name: MYSQL_HOST
               value: {{ printf "%s-mysql" .Release.Name | quote }}
