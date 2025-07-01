@@ -7,12 +7,15 @@
 ## 🚀 Features
 
 - **Go Fiber API Gateway** - High-performance HTTP framework with built-in middleware
+- **Go Fiber Swagger** - API Documentation with Go Swagger
 - **Redis Cluster** - Master-slave replication with Redis Sentinel for high availability
 - **MySQL Database** - Relational database with GORM ORM integration
-- **Prometheus** - Metrics collection and monitoring
-- **Grafana** - Data visualization and dashboards
+- **Prometheus** - Metrics collection and monitoring including Auto Service discovery (SD) feature
+- **Grafana** - Data visualization and dashboards with automatic datasource implementation
 - **Redis Insight** - Redis GUI for database management
 - **Docker Compose** - Complete container orchestration
+- **Kubernetes Helm** - Helm template for immediate deployment in a Kubernetes (k8s) cluster
+- **Loki & Promtail** - For centralized logging
 - **Makefile** - Simplified development commands
 
 ---
@@ -299,6 +302,7 @@ The Redis setup includes:
 4. **Configure backup strategies** for databases
 5. **Set up monitoring alerts** in Grafana
 6. **Use external volumes** for data persistence
+7. **ServiceAccounts & JWTs** for more security instead of BasicAuth
 
 ---
 

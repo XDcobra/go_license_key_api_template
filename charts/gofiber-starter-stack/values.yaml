@@ -8,6 +8,7 @@ apiGateway:
     type: LoadBalancer
     port: 8000
     targetPort: 8000
+  externalUrl: /api
 
 mysql:
   replicaCount: 1
@@ -28,9 +29,9 @@ mysql:
 grafana:
   replicaCount: 1
   image:
-    repository: grafana
+    repository: grafana/grafana
     tag: "latest"
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: 3000
@@ -44,9 +45,9 @@ grafana:
 prometheus:
   replicaCount: 1
   image:
-    repository: prometheus
+    repository: prom/prometheus
     tag: "latest"
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: 9090
@@ -107,6 +108,11 @@ ingress:
   annotations: {}
   host: localhost
   rewritePaths:
+    - path: /api$
+      pathType: ImplementationSpecific
+      service:
+        name: api-gateway-tcp
+        port: 8000
     - path: /api/(?!swagger)(.*)
       pathType: ImplementationSpecific
       service:
@@ -123,10 +129,28 @@ ingress:
       service:
         name: grafana
         port: 3000
-    - path: /prometheus
-      pathType: Prefix
-      service:
-        name: prometheus
-        port: 9090
+    # if you want to expose prometheus via ingress, uncomment this part
+    #- path: /prometheus
+    #  pathType: Prefix
+    #  service:
+    #    name: prometheus
+    #    port: 9090
   tls: []
 
+loki-stack:
+  loki:
+    enabled: true
+    # override the default image tag to a version >= 2.9.7
+    image:
+      repository: grafana/loki
+      tag:       "2.9.7"
+    # (optional) if you still want to tune or disable probes,
+    # you can keep your readinessProbe/livenessProbe overrides here
+  promtail:
+    enabled: true
+    # explicitly tell Promtail where to push logs:
+    config:
+      clients:
+          - url: "http://gofiber-starter-stack-loki:3100/loki/api/v1/push"
+  grafana:
+    enabled: false

@@ -16,21 +16,31 @@ spec:
       labels:
         app: {{ printf "%s-prometheus" .Release.Name }}
     spec:
+      serviceAccountName: {{ printf "%s-prometheus" .Release.Name }}
+      automountServiceAccountToken: true
       containers:
         - name: prometheus
           image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
           imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
           args:
-            - "--config.file=/etc/prometheus/prometheus.yml"
-            - "--web.config.file=/etc/prometheus/web.yml"
+            - "--config.file=/etc/prometheus/config/prometheus.yml"
             - "--web.external-url={{ .Values.prometheus.externalUrl }}"
+            - "--web.enable-lifecycle"
           ports:
             - containerPort: {{ .Values.prometheus.service.port }}
               protocol: TCP
           volumeMounts:
+            - name: prom-config
+              mountPath: /etc/prometheus/config
             - name: prom-data
               mountPath: /prometheus
       volumes:
+        - name: prom-config
+          configMap:
+            name: {{ printf "%s-prometheus-config" .Release.Name }}
+        - name: prom-web-config
+          configMap:
+            name: {{ printf "%s-prometheus-web-config" .Release.Name }}
         - name: prom-data
           persistentVolumeClaim:
             claimName: {{ printf "%s-prom-data" .Release.Name }}

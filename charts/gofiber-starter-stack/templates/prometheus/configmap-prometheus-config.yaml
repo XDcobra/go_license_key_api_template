@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-prometheus-config" .Release.Name }}
+  labels:
+    app: {{ printf "%s-prometheus" .Release.Name }}
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      evaluation_interval: 15s
+
+    alerting:
+      alertmanagers:
+      - static_configs:
+          - targets: []
+        scheme: http
+        timeout: 10s
+        api_version: v2
+
+    scrape_configs:
+      # 1) auto-discover *all* annotated Services (no auth here)
+      - job_name: "kubernetes-service-endpoints"
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+            action: keep
+            regex: "true"
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+            action: replace
+            target_label: __scheme__
+            regex: "(https?)"
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: "(.+)"
+          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+            action: replace
+            target_label: __address__
+            regex: "([^:]+)(?::\\d+)?;(\\d+)"
+            replacement: "$1:$2"
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_service_name]
+            action: replace
+            target_label: kubernetes_service
+
+      # 2) Prometheus METRICS: static job because it has basic_auth
+      - job_name: "prometheus"
+        kubernetes_sd_configs:
+          - role: endpoints
+        metrics_path: /prometheus/metrics
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: {{ printf "%s-prometheus" .Release.Name }}
+          - source_labels: [__meta_kubernetes_endpoint_port_number]
+            action: keep
+            regex: "{{ .Values.prometheus.service.port }}"
+
+
+      # 3) API-GATEWAY METRICS: static job because it has basic_auth
+      - job_name: "api-gateway"
+        kubernetes_sd_configs:
+          - role: endpoints
+        metrics_path: /metrics
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: {{ printf "%s-api-gateway-tcp" .Release.Name }}
+          - source_labels: [__meta_kubernetes_endpoint_port_number]
+            action: keep
+            regex: "{{ .Values.apiGateway.service.port }}"

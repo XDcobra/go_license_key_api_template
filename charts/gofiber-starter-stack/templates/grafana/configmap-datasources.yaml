@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-grafana-datasources" .Release.Name }}
+  labels:
+    app: {{ printf "%s-grafana" .Release.Name }}
+data:
+  loki.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://{{ printf "%s-loki" .Release.Name }}:3100
+        isDefault: false
+        jsonData:
+          maxLines: 1000
+  prometheus.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: "{{ printf "http://%s-prometheus:%d%s" .Release.Name (int .Values.prometheus.service.port) .Values.prometheus.ingressPath }}"
+        isDefault: false
+        editable: true
+        secureJsonData:
+          basicAuthUser: {{ .Values.prometheus.promUsername | quote }}
+          basicAuthPassword: {{ .Values.prometheus.promPassword | quote }}
