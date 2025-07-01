@@ -19,13 +19,6 @@ docker-build:
 	docker push localhost:5000/api-gateway:latest
 
 # Kubernetes locally
-# Starting local dev helm for the first time
-first-start:
-	minikube start	# start minikube
-	minikube addons enable ingress	# enable ingress for helm later
-	kube-env # set minikube context
-
-
 # Set Docker to use Minikube's environment
 kube-env:
 	powershell -Command "minikube -p minikube docker-env | Invoke-Expression"
