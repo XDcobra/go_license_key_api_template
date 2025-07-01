@@ -1,6 +1,9 @@
 apiVersion: v2
 name: gofiber-starter-stack
 description: A Helm chart for Kubernetes
+maintainers:
+  - email: xdcobra11@gmail.com
+    name: XDcobra
 
 # A chart can be either an 'application' or a 'library' chart.
 #

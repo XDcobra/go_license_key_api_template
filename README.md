@@ -1,34 +1,63 @@
 # GoFiber Starter Stack
 
-🚀 A production-ready Go Fiber microservices template with Docker Compose orchestration, featuring Redis clustering, MySQL database, Prometheus monitoring, and Grafana visualization.
+🚀 A production-ready Go Fiber microservices template with multiple deployment options, 
+featuring Redis clustering, MySQL database, comprehensive monitoring, and observability solutions.
 
 ---
 
-## 🚀 Features
+## 🎯 What This Repository Offers
+
+This repository provides a complete microservices stack built with **Go Fiber** that can be deployed using either:
+
+- **🐳 Docker Compose** - For local development and simple deployments
+- **☸️ Kubernetes with Helm** - For production-ready cloud deployments
+
+### 🌟 Key Features
 
 - **Go Fiber API Gateway** - High-performance HTTP framework with built-in middleware
-- **Go Fiber Swagger** - API Documentation with Go Swagger
 - **Redis Cluster** - Master-slave replication with Redis Sentinel for high availability
 - **MySQL Database** - Relational database with GORM ORM integration
-- **Prometheus** - Metrics collection and monitoring including Auto Service discovery (SD) feature
-- **Grafana** - Data visualization and dashboards with automatic datasource implementation
+- **Comprehensive Monitoring Stack**:
+  - **Prometheus** - Metrics collection and monitoring
+  - **Grafana** - Data visualization and dashboards
+  - **Loki & Promtail** - Log aggregation and querying (Kubernetes only)
 - **Redis Insight** - Redis GUI for database management
-- **Docker Compose** - Complete container orchestration
-- **Kubernetes Helm** - Helm template for immediate deployment in a Kubernetes (k8s) cluster
-- **Loki & Promtail** - For centralized logging
-- **Makefile** - Simplified development commands
+- **Go Swagger Documentation** - Auto-generated API documentation
+- **Prometheus Auto Service Discovery** - Automatic service monitoring (Kubernetes only)
 
 ---
 
-## 📋 Prerequisites
+## 🚀 Quick Start
 
-- Docker and Docker Compose
-- Go 1.24.4 or higher
-- Git
+Choose your deployment method:
+
+### 🐳 Docker Compose (Local Development)
+Perfect for local development, testing, and simple deployments.
+
+📖 **[Click here for Docker Compose Documentation](./services/README.md)**
+
+```bash
+# Quick start with Docker Compose
+git clone https://github.com/XDcobra/gofiber-starter-stack.git
+cd gofiber-starter-stack
+make docker-start
+```
+
+### ☸️ Kubernetes with Helm (Production)
+Enterprise-ready deployment with advanced features like log aggregation and auto service discovery.
+
+📖 **[Click here for Kubernetes/Helm Documentation](./charts/README.md)**
+
+```bash
+# Quick start with Kubernetes
+git clone https://github.com/XDcobra/gofiber-starter-stack.git
+cd gofiber-starter-stack/charts/gofiber-starter-stack
+helm install gofiber-starter-stack .
+```
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture Overview
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -56,80 +85,31 @@
          │              MySQL Database                     │
          │              (Port 3306)                        │
          └─────────────────────────────────────────────────┘
+
+         ┌─────────────────────────────────────────────────┐
+         │              Loki & Promtail                   │
+         │              (Kubernetes Only)                 │
+         │  ┌─────────┐ ┌─────────┐ ┌─────────┐           │
+         │  │  Loki   │ │Promtail1│ │Promtail2│           │
+         │  │ (3100)  │ │         │ │         │           │
+         │  └─────────┘ └─────────┘ └─────────┘           │
+         └─────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start
+## 📋 Prerequisites
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/XDcobra/gofiber-starter-stack.git
-   cd gofiber-starter-stack
-   ```
+### For Docker Compose
+- Docker and Docker Compose
+- Go 1.24.4 or higher
+- Git
 
-2. **Initialize Go module (if needed)**
-   ```bash
-   cd services/api-gateway
-   go mod init github.com/XDcobra/gofiber-starter-stack
-   go mod tidy
-   cd ../..
-   ```
-
-3. **Create environment file**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Start all services**
-   ```bash
-   make docker-start
-   ```
-
-5. **Access the services**
-   - API Gateway: http://localhost:8000
-   - Grafana: http://localhost:3000
-   - Prometheus: http://localhost:9090
-   - Redis Insight: http://localhost:5540
-   - MySQL: localhost:3306
-
-
-6. **For Production: Review Security settings**
-   - Please read section [🔐 Authentication & Security](#-authentication--security) and change the passwords (and usernames)
-within the .env file, as well as reviewing the exposed service ports
-
----
-
-## 📁 Project Structure
-
-```
-gofiber-starter-stack/
-├── docker-compose.yml              # Main orchestration file
-├── Makefile                        # Development commands
-├── README.md                       # This file
-├── .env.example                    # Environment variables template
-└── services/
-    ├── api-gateway/                # Go Fiber API Gateway
-    │   ├── controller/             # HTTP controllers
-    │   │   ├── DummyController/    # Example controller
-    │   │   ├── MySQLController/    # MySQL operations
-    │   │   └── RedisController/    # Redis operations
-    │   ├── database/               # Database connections
-    │   │   ├── MySQL/              # MySQL connection & models
-    │   │   └── Redis/              # Redis connection
-    │   ├── model/                  # Data models
-    │   ├── prometheus/             # Metrics configuration
-    │   ├── router/                 # Route definitions
-    │   ├── services/               # Business logic
-    │   ├── Dockerfile              # API Gateway container
-    │   ├── go.mod                  # Go dependencies
-    │   └── main.go                 # Application entry point
-    ├── grafana/                    # Grafana configuration
-    ├── mysql/                      # MySQL initialization
-    ├── prometheus/                 # Prometheus configuration
-    └── dummy_service*/             # Example microservices that you can add in the future
-```
+### For Kubernetes/Helm
+- Kubernetes cluster (minikube, kind, or cloud provider)
+- Helm 3.x
+- kubectl configured
+- Ingress controller (nginx-ingress recommended)
 
 ---
 
@@ -147,162 +127,50 @@ gofiber-starter-stack/
 - `GET /mysql/get/:id` - Get record by ID
 - `POST /mysql/post` - Create new record
 
-### Prometheus Metrics
-- `GET /metrics` - Get the raw prometheus exported data
+### Documentation & Monitoring
+- `GET /swagger/*` - Swagger API documentation
+- `GET /metrics` - Prometheus metrics endpoint
 
 ---
 
-## 🔐 Authentication & Security
+## 🔐 Security Features
 
-### Password Protected Endpoints
+Both deployment methods include:
 
-| Service | Endpoint               | Authentication Type | Environment Variable                                       | Description                     |
-|---------|------------------------|---------------------|------------------------------------------------------------|---------------------------------|
-| **Prometheus** | http://localhost:9090  | Basic Auth          | `PROM_USER` / `PROM_PASS`                                  | Metrics collection dashboard    |
-| **Grafana** | http://localhost:3000  | Admin Login         | `GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD` | Data visualization dashboard    |
-| **Redis Insight** | http://localhost:5540  | None                | -                                                          | Redis GUI (no auth by default)  |
-| **API Gateway** | http://localhost:8000/metrics | Basic Auth          | `METRICS_USER` / `METRICS_PASS`                            | Exported metrics for prometheus |
-| **MySQL** | localhost:3306         | Database Auth       | `MYSQL_ROOT_PASSWORD` / `MYSQL_USER` / `MYSQL_PASSWORD`    | Database connection             |
-
-### Environment Variables for Authentication
-
-```env
-# Golang API Gateway metrics endpoint
-METRICS_USER='metrics_user'
-METRICS_PASS='metrics_password'
-
-# Prometheus Authentication
-PROM_USER='prometheus_user'
-PROM_PASS='prometheus_password'
-
-# Grafana Authentication  
-GF_SECURITY_ADMIN_USER='admin'
-GF_SECURITY_ADMIN_PASSWORD='password'
-
-# MySQL Authentication
-MYSQL_ROOT_PASSWORD='root_password'
-MYSQL_USER='user'
-MYSQL_PASSWORD='password'
-
-# MySQL Database name
-MYSQL_DATABASE='example_db'
-```
-
-### Default Credentials
-
-- **Prometheus**: Use the values from `PROM_USER` and `PROM_PASS` in your `.env` file
-- **Grafana**: 
-  - Username: `admin`
-  - Password: Value of `GF_SECURITY_ADMIN_PASSWORD` in your `.env` file
-- **MySQL**: 
-  - Root Password: Value of `MYSQL_ROOT_PASSWORD` in your `.env` file
-  - User Password: Value of `MYSQL_PASSWORD` in your `.env` file
-
-### Security Notes
-
-- **API Gateway endpoints** are currently public - implement authentication middleware for production
-- **Redis Insight** has no authentication by default - consider adding reverse proxy with auth
-- **Prometheus and Grafana** use basic authentication - ensure strong passwords in production
-- **MySQL** uses database-level authentication - keep credentials secure
-- **Docker** exposes all service ports at the moment - for production builds, consider to only expose the service ports
-that should be reachable from the outside (e.g. remove redis-sentinel from being reachable from outside as it is not needed
-normally)
-
----
-
-## 🐳 Docker Services
-
-| Service | Port | Description |
-|---------|------|-------------|
-| API Gateway | 8000 | Go Fiber application |
-| Grafana | 3000 | Data visualization |
-| Prometheus | 9090 | Metrics collection |
-| Redis Master | 6379 | Redis primary instance |
-| Redis Slave | 6379 | Redis replica |
-| Redis Sentinel 1 | 26379 | Redis sentinel for HA |
-| Redis Sentinel 2 | 26380 | Redis sentinel for HA |
-| Redis Sentinel 3 | 26381 | Redis sentinel for HA |
-| Redis Insight | 5540 | Redis GUI |
-| MySQL | 3306 | Database |
-
----
-
-## 🛠️ Development Commands
-
-```bash
-# Start all services
-make docker-start
-
-# Stop all services
-make docker-stop
-
-# Stop and remove containers
-make docker-down
-
-# View logs
-docker-compose logs -f
-
-# Rebuild specific service
-docker-compose build api-gateway
-```
+- **Authentication** for monitoring dashboards (Prometheus, Grafana)
+- **Database security** with configurable credentials
+- **Service isolation** and network security
+- **Environment-based configuration** management
 
 ---
 
 ## 📊 Monitoring & Observability
 
-### Prometheus Metrics
-The API Gateway automatically exposes metrics at `/metrics` endpoint:
-- HTTP request duration
-- Request count by status code
-- Active connections
-- Custom business metrics
+### Docker Compose
+- Prometheus metrics collection
+- Grafana dashboards
+- Basic logging
 
-In case you want to expose more custom metrics, consider to add these into the [Gofiber-Prometheus](./services/api-gateway/prometheus/fiberprometheus.go) file
-
-### Grafana Dashboards
-Pre-configured dashboards for:
-- API Gateway performance
-- Redis cluster health
-- MySQL database metrics
-- System resource usage
-
----
-
-## 🔄 Redis Cluster Configuration
-
-The Redis setup includes:
-- **Master-Slave Replication** for data redundancy
-- **Redis Sentinel** for automatic failover
-- **Redis Insight** for visual management
-- **High Availability** with automatic master election
-
----
-
-## 🗄️ Database Setup
-
-### MySQL
-- Automatic schema migration with GORM
-- Connection pooling
-- Transaction support
-- Model auto-generation
-
-### Redis
-- Connection pooling
-- Automatic reconnection
-- Sentinel support for HA
-- Pub/Sub capabilities
+### Kubernetes/Helm
+- **Enhanced monitoring** with auto service discovery
+- **Centralized logging** with Loki & Promtail
+- **Advanced dashboards** and alerting
+- **Service mesh ready** architecture
 
 ---
 
 ## 🚀 Production Deployment
 
-1. **Update environment variables** for production
-2. **Configure SSL/TLS** certificates
-3. **Set up proper logging** and log rotation
-4. **Configure backup strategies** for databases
-5. **Set up monitoring alerts** in Grafana
-6. **Use external volumes** for data persistence
-7. **ServiceAccounts & JWTs** for more security instead of BasicAuth
+### Docker Compose
+- Suitable for small to medium deployments
+- Easy to set up and maintain
+- Good for development and testing environments
+
+### Kubernetes/Helm
+- **Enterprise-grade** scalability and reliability
+- **Auto-scaling** and load balancing
+- **Advanced monitoring** and logging
+- **Multi-environment** support (dev, staging, prod)
 
 ---
 
@@ -329,13 +197,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Redis](https://redis.io/) - In-memory data store
 - [Prometheus](https://prometheus.io/) - Monitoring system
 - [Grafana](https://grafana.com/) - Data visualization
+- [Loki](https://grafana.com/oss/loki/) - Log aggregation
+- [Helm](https://helm.sh/) - Kubernetes package 
+- [Go Swagger](https://github.com/gofiber/swagger) - Swagger for GoFiber
 
 ---
 
 ## 📞 Support
 
 If you have any questions or need help, please open an issue on GitHub.
-
----
-
-**Happy Coding! 🎉**
